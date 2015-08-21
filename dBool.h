@@ -3,10 +3,6 @@
 
 // Debounced bool
 
-/*===========================================================*/
-/*====================*/ //#define DEBUG /*====================*/
-/*===========================================================*/
-
 #include <arduino.h>
 
 #define INVERT = true
@@ -145,7 +141,7 @@ template <bool INVERTED = false>
 class dStructPin
 {
 public:
-   dStructPin(uint8_t i, uint8_t debounce, ...) :    // В качестве параметров с переменным числом аргументов передаются адреса отслеживаемых булевых переменных
+   dStructPin(uint8_t i, uint8_t debounce, ...) :    // В качестве параметров с переменным числом аргументов передаются номера пинов Ардуины
                _i(i), _debounce(debounce)
    {
       _saveTime = new uint32_t[_i];
