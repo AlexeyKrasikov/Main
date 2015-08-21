@@ -80,7 +80,8 @@ private:
 class dStructBool
 {
 public:
-   dStructBool(uint8_t i, uint8_t debounce, ...) :    // В качестве параметров с переменным числом аргументов передаются адреса отслеживаемых булевых переменных
+   // В качестве параметров с переменным числом аргументов передаются адреса отслеживаемых булевых переменных
+   dStructBool(uint8_t i, uint8_t debounce, ...) :    
                _i(i), _debounce(debounce)
    {
       _saveTime = new uint32_t[_i];
@@ -141,7 +142,8 @@ template <bool INVERTED = false>
 class dStructPin
 {
 public:
-   dStructPin(uint8_t i, uint8_t debounce, ...) :    // В качестве параметров с переменным числом аргументов передаются номера пинов Ардуины
+   // В качестве параметров с переменным числом аргументов передаются номера пинов Ардуины
+   dStructPin(uint8_t i, uint8_t debounce, ...) :    
                _i(i), _debounce(debounce)
    {
       _saveTime = new uint32_t[_i];
