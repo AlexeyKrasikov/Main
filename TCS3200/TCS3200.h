@@ -1,6 +1,8 @@
 #ifndef __TCS3200_H__
 #define __TCS3200_H__
 
+//autor Alexey Krasikov
+
 #include <arduino.h>
 
 #define DEFAULT_FREQUENCY 	_12KHZ    // POWER_DOWN, _12KHZ, _120KHZ, _600KHZ
