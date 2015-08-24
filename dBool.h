@@ -100,7 +100,7 @@ public:
       for (uint8_t i = 0; i < _i; i++) {
          _saveTime[i] = tempTime;
          _watchState[i] = va_arg(args, bool*);
-         if (*_watchState[i]) { _oldState[i >> 3] |= _BV(i % 8); }
+         if (*_watchState[i]) { _oldState[i >> 3] |= _BV(i & 0b111); }
       }
 
       va_end(args);
@@ -117,10 +117,10 @@ public:
    {
       uint32_t tempTime = millis();
       for (uint8_t i = 0; i < _i; i++) {
-         if ( *_watchState[i] != (bool)(_oldState[i >> 3] & _BV(i % 8)) ) {
+         if ( *_watchState[i] != (bool)(_oldState[i >> 3] & _BV(i & 0b111)) ) {
             if ((tempTime - _saveTime[i]) >= _debounce) {
                _saveTime[i] = tempTime;
-               *_watchState[i] ? _oldState[i >> 3] |= _BV(i % 8) : _oldState[i >> 3] &= ~_BV(i % 8);
+               *_watchState[i] ? _oldState[i >> 3] |= _BV(i & 0b111) : _oldState[i >> 3] &= ~_BV(i & 0b111);
             }
          }
       }
@@ -166,7 +166,7 @@ public:
 
          bool bTemp = digitalRead(_watchState[i]);
          if (INVERTED) { bTemp = !bTemp; }
-         if (bTemp) { _oldState[i >> 3] |= _BV(i % 8); _dOldState[i >> 3] |= _BV(i % 8); }
+         if (bTemp) { _oldState[i >> 3] |= _BV(i & 0b111); _dOldState[i >> 3] |= _BV(i & 0b111); }
       }
 
       va_end(args);
@@ -186,12 +186,12 @@ public:
       for (uint8_t i = 0; i < _i; i++) {
          bool bTemp = digitalRead(_watchState[i]);
          if (INVERTED) { bTemp = !bTemp; }
-         bTemp ? _oldState[i >> 3] |= _BV(i % 8) : _oldState[i >> 3] &= ~_BV(i % 8);
+         bTemp ? _oldState[i >> 3] |= _BV(i & 0b111) : _oldState[i >> 3] &= ~_BV(i & 0b111);
 
-         if ( (_oldState[i >> 3] & _BV(i % 8)) != (_dOldState[i >> 3] & _BV(i % 8)) ) {
+         if ( (_oldState[i >> 3] & _BV(i & 0b111)) != (_dOldState[i >> 3] & _BV(i & 0b111)) ) {
             if ((tempTime - _saveTime[i]) >= _debounce) {
                _saveTime[i] = tempTime;
-               (_oldState[i >> 3] & _BV(i % 8)) ? _dOldState[i >> 3] |= _BV(i % 8) : _dOldState[i >> 3] &= ~_BV(i % 8);
+               (_oldState[i >> 3] & _BV(i & 0b111)) ? _dOldState[i >> 3] |= _BV(i & 0b111) : _dOldState[i >> 3] &= ~_BV(i & 0b111);
             }
          }
       }
