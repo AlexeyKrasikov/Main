@@ -31,6 +31,10 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Глобальные переменные
 bool arrayOfButtons[NUMBER_BUTTON];
+const char arrayOfChar[NUMBER_BUTTON] = { 	'1', '2', '3',
+											'4', '5', '6',
+											'7', '8', '9',
+											'*', '0', '#' };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Прототипы и объявления
@@ -71,19 +75,15 @@ void callback()
 
 void extMiniprocess()
 {
-	uint8_t temp = keyboadProcess(SLAVE_ADDRESS, NUMBER_BUTTON, arrayOfButtons);
+	char temp = keyboadProcess(SLAVE_ADDRESS, NUMBER_BUTTON, arrayOfButtons);
 	switch(temp) {
 		case 1: 
-				for (uint8_t i = 0; i < NUMBER_BUTTON; i++) {
-					Serial.print(arrayOfButtons[i]); 
-					Serial.print(" ");
-				}
-				Serial.println();
+				printPushButtons();
 				break;
-		case (uint8_t)(-1): 
+		case (-1): 
 				Serial.println(F("Error CRC..."));
 				break;
-		case (uint8_t)(-2):
+		case (-2):
 				Serial.println(F("Bad message."));
 		case 0:
 		default:
@@ -91,3 +91,21 @@ void extMiniprocess()
 	}
 }
 
+void printPushButtons()
+{
+	bool temp = false;
+
+	for (uint8_t i = 0; i < NUMBER_BUTTON; i++) {
+		if (arrayOfButtons[i]) {
+			Serial.print(arrayOfChar[i]); 
+			Serial.print(" ");
+			temp = true;
+		}
+	}
+
+	if (!temp) {
+		Serial.print("- - - - -");
+	}
+
+	Serial.println();
+}
