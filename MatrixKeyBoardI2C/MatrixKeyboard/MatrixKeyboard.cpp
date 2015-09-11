@@ -1,6 +1,8 @@
 #include <arduino.h>
 #include <MatrixKeyboard.h>
 #include <dBool.h>
+#include <CRC.h>
+#include <Wire.h>
 
 MatrixKB::MatrixKB(RCPins &row, RCPins &col, uint8_t debounce) :
 				_row(row), _col(col), _debounce(debounce), DButtons( (_row.getNum() * _col.getNum()), _debounce, _buttons )
@@ -28,4 +30,76 @@ void MatrixKB::loop()
 	}
 
 	DButtons(); 
+}
+
+bool InitSlaveProcess(int slaveAddress) 
+{
+	int temp;
+
+	char buffer[3];
+
+	temp = Wire.requestFrom(slaveAddress, 2);	
+
+	if (temp == 2) {
+		for (uint8_t i = 0; i < temp; i++) {
+			buffer[i] = Wire.read();
+		}
+
+		buffer[2] = '\0';
+
+		if (!strcmp(buffer, "OK")) { return true; }
+		if (!strcmp(buffer, "KO")) { return false; }
+	}
+
+	for (uint8_t i = 0; i < temp; i++) {
+		Wire.read();
+	}
+	return false;
+}
+
+void doInitSlave(int slaveAddress, InitKeyboard &ArrayInitSlave)
+{
+	Wire.begin();
+	do {
+		delay(1000);
+		Wire.beginTransmission(slaveAddress);
+		Wire.write(ArrayInitSlave.getArray(), ArrayInitSlave.getSize());
+		Wire.endTransmission();
+	}
+	while (!InitSlaveProcess(slaveAddress));
+
+	delay(10);
+}
+
+uint8_t keyboadProcess(int slaveAddress, uint8_t numberButton, bool* arrayOfButtons)
+{
+	uint8_t numberByteMessage = numberButton/8 + ((bool)numberButton%8);
+	uint8_t buffer[numberByteMessage + 2];
+	int temp;	
+
+	temp = Wire.requestFrom(slaveAddress, numberByteMessage + 2);	
+
+	if (temp == numberByteMessage + 2) {
+		for (uint8_t i = 0; i < temp; i++) {
+			buffer[i] = Wire.read();
+		}
+	
+		uint8_t CRC = computeTableCRC8(buffer, numberByteMessage + 1);
+		if (CRC == buffer[numberByteMessage + 1]) {
+			if (buffer[numberByteMessage]) {
+				for (uint8_t i = 0; i < numberButton; i++) {
+					arrayOfButtons[i] = (bool)(buffer[i >> 3] & _BV(i & 0b111));
+				}
+				return 1;
+			}
+			return 0;
+		}
+		else { return (uint8_t)(-1); }
+	}
+	else { 
+		for (uint8_t i = 0; i < temp; i++) {
+			Wire.read();
+		}
+		return (uint8_t)(-2); 
+	}
 }
