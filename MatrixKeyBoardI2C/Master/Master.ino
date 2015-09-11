@@ -104,7 +104,7 @@ void printPushButtons()
 	}
 
 	if (!temp) {
-		Serial.print("- - - - -");
+		Serial.print(F("- - - - -"));
 	}
 
 	Serial.println();
