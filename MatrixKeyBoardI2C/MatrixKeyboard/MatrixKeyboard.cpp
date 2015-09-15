@@ -57,9 +57,17 @@ bool InitSlaveProcess(int slaveAddress)
 	return false;
 }
 
+void slaveReset(int slaveAddress)
+{
+	Wire.beginTransmission(slaveAddress);
+	Wire.write("RESET", 5);
+	Wire.endTransmission();
+}
+
 void doInitSlave(int slaveAddress, InitKeyboard &ArrayInitSlave)
 {
 	Wire.begin();
+	slaveReset(slaveAddress);
 	do {
 		delay(1000);
 		Wire.beginTransmission(slaveAddress);
@@ -71,7 +79,7 @@ void doInitSlave(int slaveAddress, InitKeyboard &ArrayInitSlave)
 	delay(10);
 }
 
-uint8_t keyboadProcess(int slaveAddress, uint8_t numberButton, bool* arrayOfButtons)
+char keyboadProcess(int slaveAddress, uint8_t numberButton, bool* arrayOfButtons)
 {
 	uint8_t numberByteMessage = numberButton/8 + ((bool)numberButton%8);
 	uint8_t buffer[numberByteMessage + 2];
@@ -94,12 +102,12 @@ uint8_t keyboadProcess(int slaveAddress, uint8_t numberButton, bool* arrayOfButt
 			}
 			return 0;
 		}
-		else { return (uint8_t)(-1); }
+		else { return (-1); }
 	}
 	else { 
 		for (uint8_t i = 0; i < temp; i++) {
 			Wire.read();
 		}
-		return (uint8_t)(-2); 
+		return (-2); 
 	}
 }

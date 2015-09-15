@@ -24,12 +24,12 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Макросы
-#define ROWS 			4
-#define COLUMNS			3
-#define NUMBER_BUTTON 	(ROWS * COLUMNS)
-#define DEBOUNCE 		20
+// #define ROWS 			4
+// #define COLUMNS			3
+// #define NUMBER_BUTTON 	(ROWS * COLUMNS)
+// #define DEBOUNCE 		20
 #define SLAVE_ADDRESS 	119
-#define NUMBER_BYTE_MESSAGE ( NUMBER_BUTTON/8 + ((bool)NUMBER_BUTTON%8) )
+// #define NUMBER_BYTE_MESSAGE ( NUMBER_BUTTON/8 + ((bool)NUMBER_BUTTON%8) )
 #define MAX_BYTE_MESSAGE 4
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ RingBuffer<uint8_t> gloBuf(192 * MAX_BYTE_MESSAGE);
 
 uint8_t numberBytes;
 bool 	InitFlag = false;
-volatile bool AnswerFlag = false;
+volatile bool AnswerFlag = false, InitOKFlag = false;
 
 uint8_t* arrayReceive = new uint8_t[22];
 uint8_t* rowsPtr = new uint8_t;
@@ -50,6 +50,7 @@ uint8_t* debouncePtr = new uint8_t;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Прототипы и объявления
+inline void wdt_off();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Начальная настройка
@@ -57,11 +58,13 @@ void setup()
 {
 	uint8_t CRC;
 
+	wdt_off();
+
 	assertInit(115200);
 	assertlnF("BEGIN DEBUG");
 
 	Wire.begin(SLAVE_ADDRESS);
-	Wire.onReceive(onReceiveSlave);
+	Wire.onReceive(onReceiveSlaveInit);
 	Wire.onRequest(onRequestSlaveInit);
 
 	while(1) {
@@ -122,12 +125,16 @@ void setup()
 
 	numberBytes = (*rowsPtr * *columnsPtr) /8 + ((bool)(*rowsPtr * *columnsPtr)%8);
 
+	InitOKFlag = true;
+
 	while(!AnswerFlag);
 
 	Wire.onRequest(onRequestSlave);
 
 	delete[] arrayReceive;
 	assertlnF("Поехали! )))");
+
+	wdt_enable(WDTO_15MS);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,6 +156,8 @@ void loop()
 		InitFlag = false;
 	}
 
+	wdt_reset();
+
 	MKB.loop();
 
 	cli();
@@ -156,7 +165,7 @@ void loop()
 	static uint8_t tempBuffer[MAX_BYTE_MESSAGE];
 	bool tempFlag = false;
 
-	for (uint8_t i = 0; i < NUMBER_BYTE_MESSAGE; i++) {
+	for (uint8_t i = 0; i < numberBytes; i++) {
 		if (tempBuffer[i] != MKB.getDStruct()[i]) {
 			tempBuffer[i] = MKB.getDStruct()[i];
 			tempFlag = true;
@@ -178,7 +187,38 @@ void loop()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Функции 
 
-void onReceiveSlave(int howMany) {}
+void onReceiveSlaveInit(int howMany) 
+{
+	ass(sei(););
+	assertF("Receive "); assert(howMany); assertlnF(" byte");
+	
+	if (howMany == 5) {
+		assertlnF("== 5");
+		char buffer[6];
+		for (uint8_t i = 0; i < 5; i++) {
+			buffer[i] = Wire.read();
+		}
+		buffer[5] = '\0';
+
+		if (!strcmp(buffer, "RESET")) {
+			assertln(buffer);
+			ass(delay(1););
+		 	cli();
+		 	wdt_enable(WDTO_15MS);
+		 	while(1);
+		}
+		return;
+	}
+
+	if (InitOKFlag) {
+		assertlnF("Очищаем ненужное..");
+
+		for (uint8_t i = 0; i < howMany; i++) {
+			Wire.read();
+		}
+		return;
+	}	
+}
 
 void onRequestSlaveInit() 
 {
@@ -201,4 +241,11 @@ void onRequestSlave()
 	buffer[numberBytes + 1] = computeTableCRC8(buffer, numberBytes + 1);
 
 	Wire.write(buffer, numberBytes + 2);
+}
+
+void wdt_off()
+{
+	wdt_reset();
+	MCUSR = ~(1<<WDRF); // выключение arduino watchdog
+  	wdt_disable();
 }

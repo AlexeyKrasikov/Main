@@ -14,7 +14,8 @@ class InitKeyboard;
 
 bool InitSlaveProcess(int slaveAddress);
 void doInitSlave(int slaveAddress, InitKeyboard &ArrayInitSlave);
-uint8_t keyboadProcess(int slaveAddress, uint8_t numberButton, bool* arrayOfButtons);
+char keyboadProcess(int slaveAddress, uint8_t numberButton, bool* arrayOfButtons);
+void slaveReset(int slaveAddress);
 
 class RCPins
 {
