@@ -23,8 +23,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Макросы
 #define ROWS 			4
-#define COLUMNS			3
-// #define COLUMNS			4
+// #define COLUMNS			3
+#define COLUMNS			4
 #define NUMBER_BUTTON 	(ROWS * COLUMNS)
 #define DEBOUNCE 		20
 #define SLAVE_ADDRESS 	119
@@ -32,14 +32,14 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Глобальные переменные
 bool arrayOfButtons[NUMBER_BUTTON];
-const char arrayOfChar[NUMBER_BUTTON] = { 	'1', '2', '3', 
-											'4', '5', '6',
-											'7', '8', '9',
-											'*', '0', '#' };
-// const char* arrayOfChar[NUMBER_BUTTON] = { 	"1", "2", "3", "Отмена",
-// 											"4", "5", "6", "Корректировка",
-// 											"7", "8", "9", "Пробел",
-// 											".", "0", "00", "Ввод" };
+// const char arrayOfChar[NUMBER_BUTTON] = { 	'1', '2', '3', 
+// 											'4', '5', '6',
+// 											'7', '8', '9',
+// 											'*', '0', '#' };
+const char* arrayOfChar[NUMBER_BUTTON] = { 	"1", "2", "3", "Отмена",
+											"4", "5", "6", "Корректировка",
+											"7", "8", "9", "Пробел",
+											".", "0", "00", "Ввод" };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Прототипы и объявления
@@ -51,15 +51,15 @@ void setup()
 	Serial.begin(115200);
 	Serial.println("Begin");
 
-	RCPins 		Rows (ROWS, 4, 5, 6, 7);
- 	RCPins 		Columns (COLUMNS, 8, 9, 10);
-	// RCPins 		Rows (ROWS, 2, 3, 4, 5);
- 	// 	RCPins 		Columns (COLUMNS, 6, 7, 8, 9);
+	// RCPins 		Rows (ROWS, 4, 5, 6, 7);
+ // 	RCPins 		Columns (COLUMNS, 8, 9, 10);
+	RCPins 		Rows (ROWS, 2, 3, 4, 5);
+ 	RCPins 		Columns (COLUMNS, 6, 7, 8, 9);
 	InitKeyboard 	ArrayInitSlave(Rows, Columns, DEBOUNCE);
 	doInitSlave(SLAVE_ADDRESS, ArrayInitSlave);
 
-	// MsTimer2::set(STD_UPDATE_PERIOD, callback);
-	// MsTimer2::start();
+	MsTimer2::set(STD_UPDATE_PERIOD, callback);
+	MsTimer2::start();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

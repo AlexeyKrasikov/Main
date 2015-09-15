@@ -69,10 +69,10 @@ void doInitSlave(int slaveAddress, InitKeyboard &ArrayInitSlave)
 	Wire.begin();
 	slaveReset(slaveAddress);
 	do {
-		delay(1000);
 		Wire.beginTransmission(slaveAddress);
 		Wire.write(ArrayInitSlave.getArray(), ArrayInitSlave.getSize());
 		Wire.endTransmission();
+		delay(500);
 	}
 	while (!InitSlaveProcess(slaveAddress));
 

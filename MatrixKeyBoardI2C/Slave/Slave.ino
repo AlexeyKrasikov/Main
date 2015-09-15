@@ -123,11 +123,13 @@ void setup()
 
 	*debouncePtr = arrayReceive[*rowsPtr + *columnsPtr + 2];
 
-	numberBytes = (*rowsPtr * *columnsPtr) /8 + ((bool)(*rowsPtr * *columnsPtr)%8);
+	numberBytes = (*rowsPtr * *columnsPtr)/8 + ((bool)(*rowsPtr * *columnsPtr)%8);
 
-	InitOKFlag = true;
+	assertlnF("Обработали");
 
 	while(!AnswerFlag);
+
+	InitOKFlag = true;
 
 	Wire.onRequest(onRequestSlave);
 
