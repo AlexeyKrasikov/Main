@@ -5,12 +5,12 @@
 #include <Wire.h>
 
 MatrixKB::MatrixKB(RCPins &row, RCPins &col, uint8_t debounce) :
-				_row(row), _col(col), _debounce(debounce), DButtons( (_row.getNum() * _col.getNum()), _debounce, _buttons)
+				_row(row), _col(col), _debounce(debounce), DButtons( (_row.getNum() * _col.getNum()), _debounce)
 {
 	while (_row.getNum() * _col.getNum() > MAX_PINS) ;
 	_buttons = new bool[_row.getNum() * _col.getNum()];	
 	readButtons();
-	DButtons.initOldState(_buttons);
+	DButtons.initOldState(&_buttons);
 }
 
 MatrixKB::~MatrixKB()
