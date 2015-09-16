@@ -74,6 +74,8 @@ protected:
          RCPins &                   _row, _col;
          bool                       *_buttons;
          dStructArrayBool<INVERT>   DButtons;
+
+         void readButtons();
 };
 
 class InitKeyboard
