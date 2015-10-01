@@ -105,6 +105,7 @@ void setup()
 
 		if(CRC == arrayReceive[lastElement]) {
 			InitFlag = true;
+			
 			break;
 		}
 	}
