@@ -148,23 +148,21 @@ class dStructArrayBool
 {
 public:
    // В качестве параметров с переменным числом аргументов передаются адреса отслеживаемых булевых переменных
-   dStructArrayBool(uint8_t j, uint8_t debounce, bool* (&watchState)) :    
-               _i(j), _debounce(debounce), _watchState(watchState)
+   dStructArrayBool(uint8_t j, uint8_t debounce) :    
+               _i(j), _debounce(debounce), _watchState(0)
    {
       _saveTime = new uint32_t[_i];
-      uint32_t tempTime = millis();
 
       uint8_t num_byte = _i / 8;
       if ((_i & 0b111) != 0) { num_byte++; }
       _oldState = new uint8_t[num_byte];
+   }
 
-      for (uint8_t i = 0; i < num_byte; i ++) { _oldState[i] = 0; }
-
-      for (uint8_t i = 0; i < _i; i++) {
-         _saveTime[i] = tempTime;
-         bool tempBool = INVERTED ? !_watchState[i] : _watchState[i];
-         if (tempBool) { _oldState[i >> 3] |= _BV(i & 0b111); }
-      }
+   dStructArrayBool(uint8_t j, uint8_t debounce, bool** watchState) :    
+               _i(j), _debounce(debounce), _watchState(watchState)
+   {
+      dStructArrayBool(j, debounce);
+      initOldState(_watchState);
    }
 
    ~dStructArrayBool() 
@@ -173,11 +171,29 @@ public:
       delete[] _oldState;
    };
 
+   void initOldState(bool** watchState)
+   {
+      uint32_t tempTime = millis();
+
+      _watchState = watchState;
+
+      uint8_t num_byte = _i / 8;
+      if ((_i & 0b111) != 0) { num_byte++; }
+
+      for (uint8_t i = 0; i < num_byte; i ++) { _oldState[i] = 0; }
+
+      for (uint8_t i = 0; i < _i; i++) {
+         _saveTime[i] = tempTime;
+         bool tempBool = INVERTED ? !(*watchState)[i] : (*watchState)[i];
+         if (tempBool) { _oldState[i >> 3] |= _BV(i & 0b111); }
+      }
+   }
+
    uint8_t* operator() (void)
    {
       uint32_t tempTime = millis();
       for (uint8_t i = 0; i < _i; i++) {
-         bool tempBool = INVERTED ? !_watchState[i] : _watchState[i];
+         bool tempBool = INVERTED ? !(*_watchState)[i] : (*_watchState)[i];
          if ( tempBool != (bool)(_oldState[i >> 3] & _BV(i & 0b111)) ) {
             if ((tempTime - _saveTime[i]) >= _debounce) {
                _saveTime[i] = tempTime;               
@@ -196,7 +212,7 @@ private:
                   _debounce;
 
    uint32_t *     _saveTime;
-   bool *&        _watchState;
+   bool **        _watchState;
    uint8_t *      _oldState;
 };
 
