@@ -1,7 +1,7 @@
 #include <CRC.h>
 #include <avr/pgmspace.h>
 
-uint8_t computeCRC8(uint8_t *Array, uint8_t len)
+uint8_t computeCRC8(const uint8_t *Array, uint8_t len)
 {
    uint8_t crc = 0xFF, i;
 
@@ -51,7 +51,7 @@ const PROGMEM uint8_t Crc8Table[256] = {
     0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
 };
 
-uint8_t computeTableCRC8(uint8_t *Array, uint8_t len)
+uint8_t computeTableCRC8(const uint8_t *Array, uint8_t len)
 {
    uint8_t crc = 0xFF;
 

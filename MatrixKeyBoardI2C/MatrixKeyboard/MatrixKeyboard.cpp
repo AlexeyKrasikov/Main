@@ -66,7 +66,7 @@ bool InitSlaveProcess(int slaveAddress)
 void slaveReset(int slaveAddress)
 {
 	Wire.beginTransmission(slaveAddress);
-	Wire.write("RESET", 5);
+	Wire.write((uint8_t*)"RESET", 5);
 	Wire.endTransmission();
 }
 
