@@ -1,5 +1,4 @@
-#include <CRC.h>
-#include <avr/pgmspace.h>
+#include "CRC.h"
 
 uint8_t computeCRC8(const uint8_t *Array, uint8_t len)
 {

@@ -1,30 +1,28 @@
 #ifndef DEBUG_H__
 #define DEBUG_H__
-
-#ifdef DEBUG
-#define ass(x)						x
-#define assert(x)                   Serial.print(x)
-#define assertln(x)                 Serial.println(x)
-#define assert2(x, y)               Serial.print(x, y)
-#define assert2ln(x, y)             Serial.println(x, y)
-#define assertF(x)                  Serial.print(F(x))
-#define assertlnF(x)                Serial.println(F(x))
-#define assert2F(x, y)              Serial.print(F(x), y)
-#define assert2lnF(x, y)            Serial.println(F(x), y)
-#define assertInit(x)               Serial.begin(x)
-#define assertFlush 				Serial.flush()
+	 
+int freeRam ();
+	 	 
+#ifdef DEBUG 
+#define debugDo(x)					x 
+#define debugPrint(x)               Serial.print(x)
+#define debugPrintF(x) 				Serial.print(F(x))
+#define debugPrintln(x)             Serial.println(x); delay(5)
+#define debugPrintlnF(x)            Serial.println(F(x)); delay(5)
+#define debugPrint2arg(x, y)        Serial.print(x, y)
+#define debugPrintln2arg(x, y)      Serial.println(x, y); delay(5)
+#define debugInit(x)                Serial.begin(x)
+#define debugFlush 				    Serial.flush();
 #else
-#define ass(x)
-#define assert(x) 
-#define assertln(x)  
-#define assert2(x, y)
-#define assert2ln(x, y) 
-#define assertF(x)                  
-#define assertlnF(x)                
-#define assert2F(x, y)              
-#define assert2lnF(x, y)                           
-#define assertInit(x)
-#define assertFlush               
+#define debugDo(x)					
+#define debugPrint(x)               
+#define debugPrintF(x) 				
+#define debugPrintln(x)             
+#define debugPrintlnF(x)            
+#define debugPrint2arg(x, y)        
+#define debugPrintln2arg(x, y)      
+#define debugInit(x)                
+#define debugFlush 				            
 #endif
-
+	 
 #endif
